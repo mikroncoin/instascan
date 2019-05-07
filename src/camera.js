@@ -1,6 +1,6 @@
-function cameraName(label) {
+function cameraName(label, fallbackIndex) {
   let clean = label.replace(/\s*\([0-9a-f]+(:[0-9a-f]+)?\)\s*$/, '');
-  return clean || label || null;
+  return clean || label || 'camera_' + fallbackIndex;
 }
 
 class MediaError extends Error {
@@ -54,9 +54,10 @@ class Camera {
     await this._ensureAccess();
 
     let devices = await navigator.mediaDevices.enumerateDevices();
+    let fallbackIndex = 0;
     return devices
       .filter(d => d.kind === 'videoinput')
-      .map(d => new Camera(d.deviceId, cameraName(d.label)));
+      .map(d => new Camera(d.deviceId, cameraName(d.label, ++fallbackIndex)));
   }
 
   static async _ensureAccess() {
